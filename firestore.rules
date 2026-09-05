@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.token.email == 'rokonkhankb12@gmail.com' ||
+        request.auth.token.admin == true
+      );
+    }
+
+    match /tasks/{taskId} {
+      // Anyone on the team can view shared tasks in real time
+      allow read: if true;
+
+      // Anyone on the team can add tasks
+      allow create: if request.resource.data.title is string
+                    && request.resource.data.title.size() > 0
+                    && request.resource.data.title.size() <= 500;
+
+      // Anyone on the team can update task status, timer, assignee, or details
+      allow update: if true;
+
+      // Only the Admin (rokonkhankb12@gmail.com) can delete completed or active tasks
+      allow delete: if isAdmin();
+    }
+
+    match /teamMembers/{memberId} {
+      allow read: if true;
+      allow write: if true;
+    }
+
+    match /test/connection {
+      allow read, write: if true;
+    }
+  }
+}

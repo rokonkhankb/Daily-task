@@ -1,0 +1,73 @@
+@import "tailwindcss";
+
+:root {
+  --bg-dark: #0f172a;
+  --accent: #38bdf8;
+  --accent-glow: rgba(56, 189, 248, 0.35);
+  --text-main: #f8fafc;
+  --text-dim: #94a3b8;
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+/* Frosted Glass Mesh Gradient Background */
+.mesh-gradient {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.16) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.16) 0px, transparent 50%),
+    radial-gradient(at 50% 20%, rgba(14, 165, 233, 0.08) 0px, transparent 40%),
+    #0f172a;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Frosted Glass Utilities */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-input {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f8fafc;
+}
+.glass-input:focus {
+  border-color: rgba(56, 189, 248, 0.5);
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+/* Subtle glow for priority indicators */
+.p-high-glow {
+  box-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+.p-medium-glow {
+  box-shadow: 0 0 8px rgba(245, 158, 11, 0.35);
+}
+.p-low-glow {
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.35);
+}
+
+/* Custom scrollbars matching dark frosted glass */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.4);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.35);
+}

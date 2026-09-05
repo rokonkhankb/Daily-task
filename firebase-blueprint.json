@@ -1,0 +1,105 @@
+{
+  "entities": {
+    "Task": {
+      "title": "Task",
+      "description": "Shared task tracked by team with priority, status, timer, assignee, and planned time",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the task"
+        },
+        "title": {
+          "type": "string",
+          "description": "Description of the task"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["Low", "Medium", "High"],
+          "description": "Priority level"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["To Do", "In Progress", "Done"],
+          "description": "Current status of the task"
+        },
+        "assigneeName": {
+          "type": "string",
+          "description": "Name of assigned team member"
+        },
+        "assigneeEmail": {
+          "type": "string",
+          "description": "Email of assigned team member"
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "User ID or email of task creator"
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Unix timestamp in milliseconds when created"
+        },
+        "updatedAt": {
+          "type": "number",
+          "description": "Unix timestamp in milliseconds when last modified"
+        },
+        "estimatedMinutes": {
+          "type": "number",
+          "description": "Target allocated duration in minutes"
+        },
+        "timeSpentSeconds": {
+          "type": "number",
+          "description": "Total tracked time in seconds"
+        },
+        "isTimerRunning": {
+          "type": "boolean",
+          "description": "Whether stopwatch is currently active"
+        },
+        "timerStartedAt": {
+          "type": "number",
+          "description": "Unix timestamp in milliseconds when current timer interval started"
+        }
+      },
+      "required": ["id", "title", "priority", "status", "createdAt", "updatedAt"]
+    },
+    "TeamMember": {
+      "title": "TeamMember",
+      "description": "Team member registered for assignment in the workspace",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Member identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Full name of team member"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of team member"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "member"],
+          "description": "Role in the workspace"
+        },
+        "addedAt": {
+          "type": "number",
+          "description": "Timestamp when added"
+        }
+      },
+      "required": ["id", "name", "role"]
+    }
+  },
+  "firestore": {
+    "/tasks/{taskId}": {
+      "schema": "Task",
+      "description": "Collection of team tasks"
+    },
+    "/teamMembers/{memberId}": {
+      "schema": "TeamMember",
+      "description": "Collection of workspace team members"
+    }
+  }
+}

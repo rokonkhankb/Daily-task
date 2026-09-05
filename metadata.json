@@ -1,0 +1,6 @@
+{
+  "name": "Daily Work Tracker",
+  "description": "A professional-grade real-time collaborative task tracker for teams with live sync, target time allocation, member assignment, stopwatch tracking, and admin-restricted task deletion.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
