@@ -175,9 +175,6 @@ let isFirestoreConnected = false;
 
 // --- Helper Functions ---
 export function isCurrentUserAdmin(): boolean {
-  if (currentUser.email && currentUser.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-    return true;
-  }
   return currentUser.role === 'admin';
 }
 
@@ -1447,80 +1444,252 @@ function renderTeamMemberListInModal(): void {
   const container = document.getElementById('modal-team-list');
   if (!container) return;
 
+  if (teamMembers.length === 0) {
+    container.innerHTML = `
+      <div class="p-4 rounded-xl bg-white/5 text-center text-xs text-slate-400">
+        টিমে কোনো মেম্বার পাওয়া যায়নি। নিচে নতুন মেম্বার যোগ করুন।
+      </div>
+    `;
+    return;
+  }
+
   container.innerHTML = teamMembers
     .map((member) => {
-      const isSelected = currentUser.email === member.email || currentUser.id === member.id;
-      const isAdmin = member.role === 'admin' || member.email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
+      const isSelected = currentUser.id === member.id || currentUser.email?.toLowerCase() === member.email?.toLowerCase();
+      const isAdmin = member.role === 'admin';
 
       return `
-        <div class="flex items-center justify-between p-3 rounded-xl ${
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-xl ${
           isSelected
-            ? 'bg-sky-500/15 border border-sky-400/30'
-            : 'bg-white/5 border border-white/5 hover:border-white/10'
-        } transition-all">
-          <div class="flex items-center gap-3">
+            ? 'bg-sky-500/15 border border-sky-400/40 shadow-[0_0_12px_rgba(56,189,248,0.15)]'
+            : 'bg-white/[0.04] border border-white/10 hover:border-white/20'
+        } gap-2.5 transition-all">
+          <div class="flex items-center gap-3 min-w-0">
             <span class="w-8 h-8 rounded-full bg-gradient-to-br ${
-              member.avatarColor || 'from-sky-400 to-blue-600'
-            } text-slate-950 text-xs font-bold flex items-center justify-center shadow-xs">
-              ${member.name.charAt(0).toUpperCase()}
+              member.avatarColor || (isAdmin ? 'from-amber-400 to-rose-500' : 'from-sky-400 to-blue-600')
+            } text-slate-950 text-xs font-bold flex items-center justify-center shrink-0 shadow-xs">
+              ${member.name.trim().charAt(0).toUpperCase()}
             </span>
-            <div>
-              <div class="text-xs font-bold text-white flex items-center gap-1.5">
-                <span>${escapeHtml(member.name)}</span>
-                ${isAdmin ? '<span class="px-1.5 py-0.2 rounded bg-amber-400/20 text-amber-300 text-[10px] font-semibold border border-amber-400/30">Admin</span>' : ''}
+            <div class="min-w-0">
+              <div class="text-xs font-bold text-white flex items-center gap-2 flex-wrap">
+                <span class="truncate">${escapeHtml(member.name)}</span>
+                ${
+                  isAdmin
+                    ? '<span class="px-2 py-0.5 rounded-md bg-amber-400/20 text-amber-300 text-[10px] font-bold border border-amber-400/30 flex items-center gap-1">👑 Admin</span>'
+                    : '<span class="px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 text-[10px] font-medium border border-white/10">👤 Member</span>'
+                }
+                ${
+                  isSelected
+                    ? '<span class="px-1.5 py-0.5 rounded bg-sky-400/20 text-sky-300 text-[9px] font-bold border border-sky-400/30">Active (You)</span>'
+                    : ''
+                }
               </div>
-              <div class="text-[11px] text-slate-400">${escapeHtml(member.email)}</div>
+              <div class="text-[11px] text-slate-400 truncate">${escapeHtml(member.email)}</div>
             </div>
           </div>
-          <button
-            type="button"
-            data-switch-user="${member.id}"
-            class="px-3 py-1.5 text-xs font-semibold rounded-lg ${
-              isSelected
-                ? 'bg-sky-500 text-slate-950 font-bold'
-                : 'bg-white/10 text-slate-200 hover:bg-white/20'
-            } transition-all cursor-pointer"
-          >
-            ${isSelected ? 'Active' : 'Switch'}
-          </button>
+
+          <div class="flex items-center gap-1.5 shrink-0 self-end sm:self-center flex-wrap">
+            <!-- Toggle Admin / Member Role Button -->
+            <button
+              type="button"
+              data-action="toggle-admin"
+              data-member-id="${member.id}"
+              class="px-2.5 py-1 text-[11px] font-semibold rounded-lg ${
+                isAdmin
+                  ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/30'
+                  : 'bg-white/5 hover:bg-white/10 text-slate-300 border border-white/10'
+              } transition-all cursor-pointer flex items-center gap-1"
+              title="${isAdmin ? 'Change role to Member' : 'Promote this member to Admin'}"
+            >
+              ${isAdmin ? 'Demote to Member' : '👑 Make Admin'}
+            </button>
+
+            <!-- Switch Active User Button -->
+            <button
+              type="button"
+              data-action="switch-user"
+              data-member-id="${member.id}"
+              class="px-2.5 py-1 text-[11px] font-semibold rounded-lg ${
+                isSelected
+                  ? 'bg-sky-500 text-slate-950 font-bold'
+                  : 'bg-white/10 text-slate-200 hover:bg-white/20'
+              } transition-all cursor-pointer"
+              title="Switch active profile"
+            >
+              ${isSelected ? 'Active' : 'Switch'}
+            </button>
+
+            <!-- Remove Member Button -->
+            <button
+              type="button"
+              data-action="remove-member"
+              data-member-id="${member.id}"
+              class="p-1.5 text-[11px] font-semibold rounded-lg bg-rose-500/10 hover:bg-rose-500/25 text-rose-400 border border-rose-500/20 hover:border-rose-500/40 transition-all cursor-pointer"
+              title="Remove this member from team"
+              aria-label="Remove member"
+            >
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
         </div>
       `;
     })
     .join('');
 
-  // Bind Switch buttons
-  container.querySelectorAll('[data-switch-user]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const memberId = btn.getAttribute('data-switch-user');
+  // Bind Actions: Toggle Admin, Switch User, Remove Member
+  container.querySelectorAll('[data-action="toggle-admin"]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const memberId = btn.getAttribute('data-member-id');
+      if (memberId) handleToggleMemberRole(memberId);
+    });
+  });
+
+  container.querySelectorAll('[data-action="switch-user"]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const memberId = btn.getAttribute('data-member-id');
       const target = teamMembers.find((m) => m.id === memberId);
       if (target) {
         saveCurrentUser(target);
-        closeUserTeamModal();
+        renderTeamMemberListInModal();
         showToast(`Active profile switched to "${target.name}"`);
       }
     });
   });
+
+  container.querySelectorAll('[data-action="remove-member"]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const memberId = btn.getAttribute('data-member-id');
+      if (memberId) handleRemoveTeamMember(memberId);
+    });
+  });
+}
+
+export async function handleToggleMemberRole(memberId: string): Promise<void> {
+  const member = teamMembers.find((m) => m.id === memberId);
+  if (!member) return;
+
+  const currentRole = member.role;
+  const newRole: 'admin' | 'member' = currentRole === 'admin' ? 'member' : 'admin';
+
+  // Safeguard: warn if demoting the only admin
+  if (newRole === 'member') {
+    const adminCount = teamMembers.filter((m) => m.role === 'admin').length;
+    if (adminCount <= 1 && member.role === 'admin') {
+      const proceed = window.confirm(
+        `"${member.name}" is currently the only Admin. Are you sure you want to demote them to Member? (At least one Admin is recommended to manage task deletions).`
+      );
+      if (!proceed) return;
+    }
+  }
+
+  member.role = newRole;
+  if (newRole === 'admin') {
+    member.avatarColor = 'from-amber-400 to-rose-500';
+  }
+
+  // If this member is the current active user, update currentUser as well
+  if (currentUser.id === member.id || currentUser.email.toLowerCase() === member.email.toLowerCase()) {
+    currentUser.role = newRole;
+    saveCurrentUser(currentUser);
+  }
+
+  saveTeamMembers(teamMembers);
+  renderTeamMemberListInModal();
+  renderAssigneeSelectOptions();
+  renderSidebarAssigneeFilters();
+  updateCurrentUserHeaderBadge();
+  renderTaskList();
+
+  showToast(`Role updated: "${member.name}" is now ${newRole === 'admin' ? 'an Admin 👑' : 'a Team Member 👤'}`);
+
+  // Sync role update to Firestore
+  try {
+    await setDoc(doc(db, 'teamMembers', member.id), member, { merge: true });
+  } catch (err) {
+    console.warn('Firestore member role update error:', err);
+  }
+}
+
+export async function handleRemoveTeamMember(memberId: string): Promise<void> {
+  const member = teamMembers.find((m) => m.id === memberId);
+  if (!member) return;
+
+  if (teamMembers.length <= 1) {
+    showToast('Cannot remove the last member of the workspace.');
+    return;
+  }
+
+  const confirmRemove = window.confirm(
+    `Are you sure you want to remove "${member.name}" (${member.role === 'admin' ? 'Admin' : 'Member'}) from the team?`
+  );
+  if (!confirmRemove) return;
+
+  // Remove from local list
+  teamMembers = teamMembers.filter((m) => m.id !== memberId);
+  saveTeamMembers(teamMembers);
+
+  // If the removed user was the active user, switch to another admin or first available member
+  if (currentUser.id === memberId || currentUser.email.toLowerCase() === member.email.toLowerCase()) {
+    const nextUser = teamMembers.find((m) => m.role === 'admin') || teamMembers[0];
+    if (nextUser) {
+      saveCurrentUser(nextUser);
+      showToast(`Switched active profile to "${nextUser.name}"`);
+    }
+  }
+
+  renderTeamMemberListInModal();
+  renderAssigneeSelectOptions();
+  renderSidebarAssigneeFilters();
+  updateCurrentUserHeaderBadge();
+  renderTaskList();
+
+  showToast(`Removed "${member.name}" from workspace`);
+
+  // Delete from Firestore
+  try {
+    await deleteDoc(doc(db, 'teamMembers', memberId));
+  } catch (err) {
+    console.warn('Firestore member delete error:', err);
+  }
 }
 
 export async function handleAddNewTeamMember(e?: Event): Promise<void> {
   if (e) e.preventDefault();
   const nameInput = document.getElementById('new-member-name') as HTMLInputElement | null;
   const emailInput = document.getElementById('new-member-email') as HTMLInputElement | null;
+  const roleSelect = document.getElementById('new-member-role') as HTMLSelectElement | null;
 
   const name = nameInput?.value.trim();
   const email = emailInput?.value.trim().toLowerCase() || `${name?.toLowerCase().replace(/\s+/g, '')}@team.com`;
+  const role = (roleSelect?.value === 'admin' ? 'admin' : 'member') as 'admin' | 'member';
 
   if (!name) {
     showToast('Please enter member name');
     return;
   }
 
+  const colorOptions = [
+    'from-sky-400 to-blue-600',
+    'from-emerald-400 to-teal-600',
+    'from-violet-400 to-purple-600',
+    'from-cyan-400 to-indigo-600',
+    'from-fuchsia-400 to-pink-600',
+  ];
+  const avatarColor = role === 'admin'
+    ? 'from-amber-400 to-rose-500'
+    : colorOptions[teamMembers.length % colorOptions.length];
+
   const newMember: TeamMember = {
-    id: `member_${Date.now()}`,
+    id: `member_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
     name,
     email,
-    role: email === ADMIN_EMAIL.toLowerCase() ? 'admin' : 'member',
-    avatarColor: 'from-cyan-400 to-indigo-600',
+    role,
+    avatarColor,
   };
 
   teamMembers.push(newMember);
@@ -1528,11 +1697,12 @@ export async function handleAddNewTeamMember(e?: Event): Promise<void> {
 
   if (nameInput) nameInput.value = '';
   if (emailInput) emailInput.value = '';
+  if (roleSelect) roleSelect.value = 'member';
 
   renderTeamMemberListInModal();
   renderAssigneeSelectOptions();
   renderSidebarAssigneeFilters();
-  showToast(`Added "${name}" to workspace team!`);
+  showToast(`Added "${name}" as ${role === 'admin' ? 'Admin 👑' : 'Member 👤'}`);
 
   // Sync member to Firestore
   try {
@@ -1852,14 +2022,28 @@ function subscribeToFirestoreUpdates(): void {
       });
 
       if (remoteMembers.length > 0) {
-        // Merge with default admin
-        const map = new Map<string, TeamMember>();
-        DEFAULT_TEAM_MEMBERS.forEach((m) => map.set(m.id, m));
-        remoteMembers.forEach((m) => map.set(m.id, m));
-        teamMembers = Array.from(map.values());
+        teamMembers = remoteMembers;
         saveTeamMembers(teamMembers);
+
+        // Sync active user if matching member exists
+        const matched = teamMembers.find(
+          (m) => m.id === currentUser.id || m.email?.toLowerCase() === currentUser.email?.toLowerCase()
+        );
+        if (matched) {
+          currentUser = matched;
+          localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(matched));
+          updateCurrentUserHeaderBadge();
+        }
+
+        renderTeamMemberListInModal();
         renderAssigneeSelectOptions();
         renderSidebarAssigneeFilters();
+        renderTaskList();
+      } else {
+        // Seed default team members if collection is empty
+        DEFAULT_TEAM_MEMBERS.forEach((m) => {
+          setDoc(doc(db, 'teamMembers', m.id), m).catch(console.error);
+        });
       }
     }, (err) => {
       console.warn('Firestore teamMembers snapshot subscription error:', err);
