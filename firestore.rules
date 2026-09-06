@@ -19,6 +19,11 @@ service cloud.firestore {
       allow read, write: if true;
     }
 
+    match /teamInvitations/{inviteId} {
+      // Email invitation requests for onboarding team members
+      allow read, write: if true;
+    }
+
     match /test/connection {
       allow read, write: if true;
     }

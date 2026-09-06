@@ -1,0 +1,153 @@
+import fs from 'fs';
+
+function buildAuthorityParkSvgs() {
+  // 1. EMBLEM ONLY (AP Monogram) - 1:1 Square viewBox (500x500)
+  // Transparent background, zero white pixels.
+  const emblemSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 500" fill="none" width="100%" height="100%">
+  <defs>
+    <!-- Brand Cyan-Teal to Lime-Green Gradient -->
+    <linearGradient id="apBrandGrad" x1="5%" y1="95%" x2="85%" y2="5%">
+      <stop offset="0%" stop-color="#025678" />
+      <stop offset="15%" stop-color="#007e9e" />
+      <stop offset="35%" stop-color="#00a5af" />
+      <stop offset="50%" stop-color="#16b899" />
+      <stop offset="68%" stop-color="#5ec560" />
+      <stop offset="85%" stop-color="#93d13c" />
+      <stop offset="100%" stop-color="#addb30" />
+    </linearGradient>
+    <filter id="apGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#16b899" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <g id="ap-monogram-symbol" filter="url(#apGlow)">
+    <!-- Main Outer Monogram Loop (EvenOdd Fill for transparent inner spaces) -->
+    <path
+      fill="url(#apBrandGrad)"
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="
+        M 18 475 
+        L 82 475 
+        L 138 355 
+        L 285 355 
+        C 375 355 480 320 480 205 
+        C 480 85 375 25 240 25 
+        C 224 25 210 32 200 48 
+        L 18 475 
+        Z
+
+        M 218 95 
+        L 292 295 
+        L 165 295 
+        Z
+
+        M 268 85 
+        C 345 85 418 118 418 205 
+        C 418 285 355 295 305 295 
+        L 298 295 
+        L 255 145 
+        C 259 122 263 102 268 85 
+        Z
+      "
+    />
+  </g>
+</svg>`;
+
+  // 2. FULL HORIZONTAL LOGO (AP Monogram + AUTHORITY PARK Typography)
+  // Aspect ratio matches the user's 2048x564 image (approx 3.63 : 1)
+  // Transparent background, exact gradients on both text lines.
+  const fullLogoSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1700 480" fill="none" width="100%" height="100%">
+  <defs>
+    <!-- Emblem Gradient -->
+    <linearGradient id="fullEmblemGrad" x1="5%" y1="95%" x2="85%" y2="5%">
+      <stop offset="0%" stop-color="#025678" />
+      <stop offset="15%" stop-color="#007e9e" />
+      <stop offset="35%" stop-color="#00a5af" />
+      <stop offset="50%" stop-color="#16b899" />
+      <stop offset="68%" stop-color="#5ec560" />
+      <stop offset="85%" stop-color="#93d13c" />
+      <stop offset="100%" stop-color="#addb30" />
+    </linearGradient>
+
+    <!-- 'AUTHORITY' Text Gradient (Teal -> Green -> Lime) -->
+    <linearGradient id="authorityTextGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0080a4" />
+      <stop offset="22%" stop-color="#009eb0" />
+      <stop offset="48%" stop-color="#12b395" />
+      <stop offset="75%" stop-color="#57c464" />
+      <stop offset="100%" stop-color="#addb30" />
+    </linearGradient>
+
+    <!-- 'PARK' Text Gradient (Lime-Green -> Teal-Cyan) -->
+    <linearGradient id="parkTextGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#72c754" />
+      <stop offset="32%" stop-color="#38b97d" />
+      <stop offset="65%" stop-color="#12a8a0" />
+      <stop offset="100%" stop-color="#0094a8" />
+    </linearGradient>
+  </defs>
+
+  <!-- Left: AP Monogram Emblem -->
+  <g transform="translate(10, 0)">
+    <path
+      fill="url(#fullEmblemGrad)"
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="
+        M 18 475 
+        L 82 475 
+        L 138 355 
+        L 285 355 
+        C 375 355 480 320 480 205 
+        C 480 85 375 25 240 25 
+        C 224 25 210 32 200 48 
+        L 18 475 
+        Z
+
+        M 218 95 
+        L 292 295 
+        L 165 295 
+        Z
+
+        M 268 85 
+        C 345 85 418 118 418 205 
+        C 418 285 355 295 305 295 
+        L 298 295 
+        L 255 145 
+        C 259 122 263 102 268 85 
+        Z
+      "
+    />
+  </g>
+
+  <!-- Right: Typography 'AUTHORITY' and 'PARK' -->
+  <!-- Line 1: AUTHORITY -->
+  <text 
+    x="550" 
+    y="235" 
+    fill="url(#authorityTextGrad)" 
+    font-family="'Montserrat', 'Poppins', 'Outfit', 'Segoe UI', system-ui, sans-serif" 
+    font-size="168" 
+    font-weight="900" 
+    letter-spacing="0.02em"
+  >AUTHORITY</text>
+
+  <!-- Line 2: P A R K (Expanded tracking to match AUTHORITY width) -->
+  <text 
+    x="555" 
+    y="365" 
+    fill="url(#parkTextGrad)" 
+    font-family="'Montserrat', 'Poppins', 'Outfit', 'Segoe UI', system-ui, sans-serif" 
+    font-size="108" 
+    font-weight="800" 
+    letter-spacing="0.52em"
+  >PARK</text>
+</svg>`;
+
+  fs.writeFileSync('public/authority-park-logo.svg', emblemSvg);
+  fs.writeFileSync('public/authority-park-full-logo.svg', fullLogoSvg);
+  console.log('Successfully generated public/authority-park-logo.svg & public/authority-park-full-logo.svg');
+}
+
+buildAuthorityParkSvgs();

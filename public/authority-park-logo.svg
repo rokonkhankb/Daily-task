@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 540 500" fill="none" width="100%" height="100%">
+  <defs>
+    <!-- Brand Cyan-Teal to Lime-Green Gradient -->
+    <linearGradient id="apBrandGrad" x1="5%" y1="95%" x2="85%" y2="5%">
+      <stop offset="0%" stop-color="#025678" />
+      <stop offset="15%" stop-color="#007e9e" />
+      <stop offset="35%" stop-color="#00a5af" />
+      <stop offset="50%" stop-color="#16b899" />
+      <stop offset="68%" stop-color="#5ec560" />
+      <stop offset="85%" stop-color="#93d13c" />
+      <stop offset="100%" stop-color="#addb30" />
+    </linearGradient>
+    <filter id="apGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#16b899" flood-opacity="0.25" />
+    </filter>
+  </defs>
+
+  <g id="ap-monogram-symbol" filter="url(#apGlow)">
+    <!-- Main Outer Monogram Loop (EvenOdd Fill for transparent inner spaces) -->
+    <path
+      fill="url(#apBrandGrad)"
+      fill-rule="evenodd"
+      clip-rule="evenodd"
+      d="
+        M 18 475 
+        L 82 475 
+        L 138 355 
+        L 285 355 
+        C 375 355 480 320 480 205 
+        C 480 85 375 25 240 25 
+        C 224 25 210 32 200 48 
+        L 18 475 
+        Z
+
+        M 218 95 
+        L 292 295 
+        L 165 295 
+        Z
+
+        M 268 85 
+        C 345 85 418 118 418 205 
+        C 418 285 355 295 305 295 
+        L 298 295 
+        L 255 145 
+        C 259 122 263 102 268 85 
+        Z
+      "
+    />
+  </g>
+</svg>

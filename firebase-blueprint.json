@@ -90,6 +90,48 @@
         }
       },
       "required": ["id", "name", "role"]
+    },
+    "TeamInvitation": {
+      "title": "TeamInvitation",
+      "description": "Email invitation request for onboarding new team members",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique invitation identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the invited person"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the invited person"
+        },
+        "role": {
+          "type": "string",
+          "enum": ["admin", "member"],
+          "description": "Assigned role upon acceptance"
+        },
+        "invitedBy": {
+          "type": "string",
+          "description": "Admin email who sent the invite"
+        },
+        "invitedByName": {
+          "type": "string",
+          "description": "Admin name who sent the invite"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "accepted", "cancelled"],
+          "description": "Current state of the invitation"
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "Timestamp when invite was created"
+        }
+      },
+      "required": ["id", "name", "email", "role", "status", "createdAt"]
     }
   },
   "firestore": {
@@ -100,6 +142,10 @@
     "/teamMembers/{memberId}": {
       "schema": "TeamMember",
       "description": "Collection of workspace team members"
+    },
+    "/teamInvitations/{inviteId}": {
+      "schema": "TeamInvitation",
+      "description": "Collection of workspace member invitations"
     }
   }
 }
